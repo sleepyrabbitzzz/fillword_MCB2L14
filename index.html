@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拼音填字遊戲 (Pinyin Crossword)</title>
+    <title>拼音填字游戏 (Pinyin Crossword)</title>
     <style>
         body {
-            font-family: "Arial", "微軟正黑體", sans-serif;
+            font-family: "Arial", "微软正黑体", sans-serif;
             background-color: #f4f6f7;
             display: flex;
             flex-direction: column;
@@ -27,7 +27,7 @@
             max-width: 1200px;
         }
 
-        /* 網格樣式 */
+        /* 网格样式 */
         #crossword-board {
             display: grid;
             background: #2c3e50;
@@ -53,7 +53,7 @@
             height: 100%;
             border: none;
             text-align: center;
-            font-size: 1.2em; /* 拼音字母大寫 */
+            font-size: 1.2em; /* 拼音字母大写 */
             text-transform: uppercase;
             font-weight: bold;
             background: transparent;
@@ -64,7 +64,7 @@
         
         .cell input:focus { background-color: #e8f6f3; }
 
-        /* 題號 */
+        /* 题号 */
         .cell-number {
             position: absolute;
             top: 1px;
@@ -76,7 +76,7 @@
             z-index: 2;
         }
 
-        /* 提示區 */
+        /* 提示区 */
         .clues-container {
             display: flex;
             flex-direction: column;
@@ -106,7 +106,7 @@
             font-size: 0.95em;
         }
         
-        /* 強調漢字 */
+        /* 强调汉字 */
         .hanzi-hint {
             font-weight: bold;
             color: #333;
@@ -148,13 +148,13 @@
 </head>
 <body>
 
-    <h1>拼音填字遊戲</h1>
-    <div class="sub-text">請根據提示輸入拼音 (不含聲調)</div>
+    <h1>拼音填字游戏</h1>
+    <div class="sub-text">请根据提示输入拼音 (不含声调)</div>
 
     <div class="game-wrapper">
         <div class="clues-container">
             <div class="clue-section">
-                <h3>➡ 橫向 (Across)</h3>
+                <h3>➡ 横向 (Across)</h3>
                 <ul id="across-list"></ul>
             </div>
             <div class="clue-section">
@@ -167,15 +167,15 @@
     </div>
 
     <div class="controls">
-        <button class="btn-check" onclick="checkAnswers()">檢查答案</button>
-        <button class="btn-reveal" onclick="revealAnswers()">顯示解答</button>
+        <button class="btn-check" onclick="checkAnswers()">检查答案</button>
+        <button class="btn-reveal" onclick="revealAnswers()">显示解答</button>
         <button class="btn-retry" onclick="initGame()">重新生成</button>
     </div>
 
     <script src="words02.js"></script>
 
     <script>
-        const BOARD_SIZE = 20; // 拼音比較長，網格加大到 20x20
+        const BOARD_SIZE = 20; // 拼音比较长，网格加大到 20x20
         let grid = [];
         let activeWords = [];
         
@@ -184,21 +184,21 @@
         const downListEl = document.getElementById('down-list');
 
         if (typeof wordData === 'undefined') {
-            alert("找不到 words02.js，請確認檔案存在。");
+            alert("找不到 words02.js，请确认档案存在。");
         }
 
         function initGame() {
-            // 清空與重置
+            // 清空与重置
             grid = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
             activeWords = [];
             boardEl.innerHTML = '';
             acrossListEl.innerHTML = '';
             downListEl.innerHTML = '';
 
-            // 檢查資料是否有 pinyin 欄位
+            // 检查数据是否有 pinyin 字段
             const validData = wordData.filter(w => w.pinyin);
             if(validData.length === 0) {
-                alert("資料錯誤：請在 words02.js 中為每個單字加入 'pinyin' 欄位 (例如 pinyin: 'nihao')");
+                alert("数据错误：请在 words02.js 中为每个单字加入 'pinyin' 字段 (例如 pinyin: 'nihao')");
                 return;
             }
 
@@ -208,17 +208,17 @@
         }
 
         function generateLayout(data) {
-            // 1. 清理資料：轉大寫，去空格
+            // 1. 清理资料：转大写，去空格
             let words = data.map(item => ({
                 ...item,
                 cleanPinyin: item.pinyin.replace(/[^a-zA-Z]/g, '').toUpperCase(),
                 isPlaced: false
             }));
 
-            // 2. 排序：長字優先
+            // 2. 排序：长字优先
             words.sort((a, b) => b.cleanPinyin.length - a.cleanPinyin.length);
 
-            // 3. 放置第一個字
+            // 3. 放置第一个字
             if (words.length > 0) {
                 let first = words[0];
                 let startRow = Math.floor(BOARD_SIZE / 2);
@@ -227,8 +227,8 @@
                 first.isPlaced = true;
             }
 
-            // 4. 貪婪演算法放置其餘單字
-            for (let pass = 0; pass < 3; pass++) { // 多掃幾次增加成功率
+            // 4. 贪婪算法放置其余单字
+            for (let pass = 0; pass < 3; pass++) { // 多扫几次增加成功率
                 for (let i = 0; i < words.length; i++) {
                     let current = words[i];
                     if (current.isPlaced) continue;
@@ -243,18 +243,18 @@
         }
 
         function findBestPosition(text) {
-            // 遍歷網格上的每個格子
+            // 遍历网格上的每个格子
             for (let r = 0; r < BOARD_SIZE; r++) {
                 for (let c = 0; c < BOARD_SIZE; c++) {
                     if (grid[r][c]) {
-                        // 網格上有字母，檢查新單字是否有這個字母
+                        // 网格上有字母，检查新单字是否有这个字母
                         let charOnGrid = grid[r][c].char;
                         
                         for (let i = 0; i < text.length; i++) {
                             if (text[i] === charOnGrid) {
-                                // 找到共同字母，嘗試交叉放置
-                                // 這裡的邏輯是：單字長度 text.length，交叉點在單字的第 i 個位置
-                                // 所以起始位置要減去 i
+                                // 找到共同字母，尝试交叉放置
+                                // 这里的逻辑是：单字长度 text.length，交叉点在单字的第 i 个位置
+                                // 所以起始位置要减去 i
                                 if (canPlace(text, r - i, c, 'down')) {
                                     return { row: r - i, col: c, dir: 'down' };
                                 }
@@ -272,11 +272,11 @@
         function canPlace(text, row, col, dir) {
             if (row < 0 || col < 0) return false;
             
-            // 邊界檢查
+            // 边界检查
             if (dir === 'across') {
                 if (col + text.length > BOARD_SIZE) return false;
-                if (col > 0 && grid[row][col-1]) return false; // 左邊不能有字
-                if (col + text.length < BOARD_SIZE && grid[row][col+text.length]) return false; // 右邊不能有字
+                if (col > 0 && grid[row][col-1]) return false; // 左边不能有字
+                if (col + text.length < BOARD_SIZE && grid[row][col+text.length]) return false; // 右边不能有字
             } else {
                 if (row + text.length > BOARD_SIZE) return false;
                 if (row > 0 && grid[row-1][col]) return false; // 上面不能有字
@@ -288,10 +288,10 @@
                 let c = col + (dir === 'across' ? i : 0);
 
                 if (grid[r][c]) {
-                    // 如果格子已有字，必須完全相同 (交叉點)
+                    // 如果格子已有字，必须完全相同 (交叉点)
                     if (grid[r][c].char !== text[i]) return false;
                 } else {
-                    // 如果格子是空的，檢查"兩側"是否淨空 (避免平行相鄰)
+                    // 如果格子是空的，检查"两侧"是否净空 (避免平行相邻)
                     if (dir === 'across') {
                         if ((r > 0 && grid[r-1][c]) || (r < BOARD_SIZE-1 && grid[r+1][c])) return false;
                     } else {
@@ -321,7 +321,7 @@
         function drawBoard() {
             boardEl.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
 
-            // 計算題號
+            // 计算题号
             activeWords.sort((a, b) => (a.row * BOARD_SIZE + a.col) - (b.row * BOARD_SIZE + b.col));
             let numberCounter = 1;
             let cellNumbers = {};
@@ -342,7 +342,7 @@
                     if (grid[r][c]) {
                         cell.classList.add('active');
                         
-                        // 題號
+                        // 题号
                         let key = `${r},${c}`;
                         if (cellNumbers[key]) {
                             let numSpan = document.createElement('span');
@@ -351,17 +351,17 @@
                             cell.appendChild(numSpan);
                         }
 
-                        // 輸入框
+                        // 输入框
                         let input = document.createElement('input');
                         input.maxLength = 1;
                         input.dataset.answer = grid[r][c].char;
                         
-                        // 簡單的自動跳下格功能 (僅橫向)
+                        // 简单的自动跳下格功能 (仅横向)
                         input.onkeyup = function(e) {
                             this.classList.remove('wrong', 'correct');
                             if(this.value.length === 1 && e.key.match(/[a-z]/i)) {
-                                // 嘗試找下一個 input
-                                // 這裡只是簡單優化，真正的跳格邏輯很複雜
+                                // 尝试找下一个 input
+                                // 这里只是简单优化，真正的跳格逻辑很复杂
                             }
                         };
 
@@ -375,7 +375,7 @@
         function renderClues() {
             activeWords.forEach(w => {
                 let li = document.createElement('li');
-                // 提示格式： 1. [漢字] English Meaning
+                // 提示格式： 1. [汉字] English Meaning
                 li.innerHTML = `<strong>${w.number}.</strong> <span class="hanzi-hint">${w.original.word}</span> ${w.original.meaning}`;
                 
                 if (w.dir === 'across') {
@@ -402,12 +402,12 @@
             });
 
             if (correctCount === inputs.length && inputs.length > 0) {
-                setTimeout(() => alert("太棒了！拼音全對！🎉"), 100);
+                setTimeout(() => alert("太棒了！拼音全对！🎉"), 100);
             }
         }
 
         function revealAnswers() {
-            if(!confirm("確定要偷看所有答案嗎？")) return;
+            if(!confirm("确定要偷看所有答案吗？")) return;
             let inputs = document.querySelectorAll('.cell input');
             inputs.forEach(input => {
                 input.value = input.dataset.answer;
